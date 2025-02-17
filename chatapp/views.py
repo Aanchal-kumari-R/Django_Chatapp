@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render 
+from .models import ChatRoom
 
-def index(request): 
-    return render(request,'chatapp/index.html')
+def index(request):  
+    chatRooms = ChatRoom.objects.all()
+    return render(request,'chatapp/index.html',{'chatRooms':chatRooms})
