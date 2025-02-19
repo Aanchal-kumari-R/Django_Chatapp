@@ -1,15 +1,16 @@
-{{chatRoom.name}} 
+{{chatRoom.name}}  
 
 <form method="post"> 
-    <input type="text",name = "message", placeholder = "Enter message"> 
-    <button type="submit">Send</button> 
-
+    <input id="message-input" type="text",name = "message", placeholder = "Enter message"> 
+    <button id="send-button" type="submit">Send</button> 
 </form> 
 
-{{ chatRoom.slug|json_script:"json_chatroomname" }} 
+{{ chatRoom.slug|json_script:"json_chatroomname"}} 
+{{ request.user.username|json_script:"json-username"}}
 
 <script> 
     const chatRoomName = JSON.parse(document.getElementById('json_chatroomname').textContent); 
+    const username = JSON.parse(document.getElementById('json-username').textContent); 
     const chatSocket = new WebSocket( 
         'ws://' 
         +window.location.host 
@@ -22,5 +23,21 @@
     } 
     chatSocket.onclose = function(e){ 
         console.log("Socket closed.");
+    } 
+
+    document.getElementById("send-button").onclick = function(e){ 
+        e.preventDefault(); 
+        const messageInput = document.getElementById('message-input'); 
+        const message = messageInput.value; 
+        console.log(message); 
+
+        chatSocket.send(JSON.stringify({ 
+            'message':message, 
+            'username':username, 
+            'room':chatRoomName, 
+
+        })); 
+        messageInput.value = "";  
+
     }
 </script>
